@@ -39,10 +39,6 @@ For example, if you have two `API` instances (e.g. for two different users) and 
 
 Look into `models.py` to see which methods exist for which models.
 
-Attribute access
-----------------
-You can access a model's attributes as actual attributes, like `status.text` or as dictionary keys, like `status['text']`.
-
 Image uploading
 ---------------
 For all API endpoints that take an image as a parameter, just pass the image file object to upload as the appropriate parameter and the pony will do the rest for you.
@@ -59,7 +55,7 @@ An `APIError` instance has the following attributes:
 
 Models
 ------
-If you're not using the raw API call method, every API call will return a parsed model instance representing the response data.
+Almost every API call (except for the ones that return only a list or something equally simple) will return a parsed model instance representing the response data.
 There are `User`, `Status`, `Message`, `List` and `APIError` models.
 You can access the response data as instance attributes like `status.text` or using a dictionary lookup like `status['text']`.
 
@@ -81,11 +77,11 @@ Usage example
 
 	import tweetpony
 	api = tweetpony.API(consumer_key = "abc", consumer_secret = "def", access_token = "ghi", access_token_secret = "jkl")
-	user = api.me
+	user = api.user
 	print "Hello, @%s!" % user.screen_name
 	text = raw_input("What would you like to tweet? ")
 	try:
-		api.post_statuses__update(status = text)
+		api.update_status(status = text)
 	except tweetpony.APIError as err:
 		print "Oops, something went wrong! Twitter returned error #%i and said: %s" % (err.code, err.description)
 	else:
