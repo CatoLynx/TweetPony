@@ -733,3 +733,46 @@ ENDPOINTS = {
 		'model': RateLimitStatus,
 	},
 }
+
+STREAM_ENDPOINTS = {
+	'filter_stream': {
+		'endpoint': "statuses/filter.json",
+		'host': "stream.twitter.com",
+		'post': True,
+		'url_params': [],
+		'required_params': [],
+		'optional_params': ['follow', 'track', 'locations', 'stall_warnings'],
+	},
+	'sample_stream': {
+		'endpoint': "statuses/sample.json",
+		'host': "stream.twitter.com",
+		'post': False,
+		'url_params': [],
+		'required_params': [],
+		'optional_params': ['stall_warnings'],
+	},
+	'firehose_stream': {
+		'endpoint': "statuses/firehose.json",
+		'host': "stream.twitter.com",
+		'post': False,
+		'url_params': [],
+		'required_params': [],
+		'optional_params': ['count', 'stall_warnings'],
+	},
+	'user_stream': {
+		'endpoint': "user.json",
+		'host': "userstream.twitter.com",
+		'post': False,
+		'url_params': [],
+		'required_params': [],
+		'optional_params': ['stall_warnings', 'with', 'replies', 'track', 'locations'],
+	},
+	'site_stream': {
+		'endpoint': "site.json",
+		'host': "sitestream.twitter.com",
+		'post': False,
+		'url_params': [],
+		'required_params': [],
+		'optional_params': ['follow', 'stall_warnings', 'with', 'replies'],
+	},
+}

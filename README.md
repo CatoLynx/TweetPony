@@ -1,6 +1,6 @@
 TweetPony – A Twitter library for Python
 ========================================
-This API wrapper was inspired by [Tweepy](https://github.com/tweepy/tweepy). It's called TweetPony because I developed it with ponies in mind.
+…it's called TweetPony because I developed it with ponies in mind.
 
 License
 -------

@@ -118,6 +118,9 @@ class Status(Model):
 		else:
 			text = utils.optimize_mentions([self.user.screen_name], text)
 		return self.api.update_status(status = text, in_reply_to_status_id = self.id, **kwargs)
+	
+	def retweets(self, **kwargs):
+		return self.api.retweets(id = self.id, **kwargs)
 
 class User(Model):
 	@classmethod
@@ -356,6 +359,9 @@ class IDCollection(list):
 	def from_json(cls, data):
 		self = cls(data)
 		return self
+	
+	def connect_api(self, api):
+		pass
 
 class RelationshipCollection(ModelCollection):
 	model = Relationship
