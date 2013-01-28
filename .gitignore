@@ -1,0 +1,4 @@
+*.pyc
+TweetPony.egg-info/
+build/
+dist/
