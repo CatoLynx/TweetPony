@@ -58,7 +58,7 @@ class API:
 		self.secure = secure
 		self._endpoint = None
 		self._multipart = False
-		self.user = self.verify_credentials()
+		self.user = self.verify_credentials() if self.access_token and self.access_token_secret else None
 	
 	def __getattr__(self, attr):
 		self._endpoint = attr
@@ -77,8 +77,9 @@ class API:
 			'oauth_signature_method': "HMAC-SHA1",
 			'oauth_timestamp': str(int(time.time())),
 			'oauth_version': "1.0",
-			'oauth_token': self.access_token,
 		}
+		if self.access_token:
+			auth_data['oauth_token'] = self.access_token
 		return auth_data
 	
 	def generate_oauth_header(self, auth_data):
@@ -152,8 +153,7 @@ class API:
 	
 	def request_token(self):
 		url = self.build_request_url(self.oauth_root, 'request_token')
-		req = urllib2.Request(url, data = "")
-		resp = self.do_request(req, is_json = False)
+		resp = self.do_request("GET", url, is_json = False)
 		token_data = self.parse_qs(resp)
 		self.access_token = token_data['oauth_token']
 		self.access_token_secret = token_data['oauth_token_secret']
@@ -166,11 +166,11 @@ class API:
 	
 	def authenticate(self, verifier):
 		url = self.build_request_url(self.oauth_root, 'access_token')
-		req = urllib2.Request(url, data = urllib.urlencode({'oauth_verifier': verifier}))
-		resp = self.do_request(req, is_json = False)
+		resp = self.do_request("GET", url, is_json = False)
 		token_data = self.parse_qs(resp)
 		self.access_token = token_data['oauth_token']
 		self.access_token_secret = token_data['oauth_token_secret']
+		self.user = self.verify_credentials()
 		return ((self.access_token, self.access_token_secret), token_data['user_id'], token_data['screen_name'])
 	
 	def parse_param(self, key, value):
