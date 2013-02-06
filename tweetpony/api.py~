@@ -64,11 +64,6 @@ class API:
 		self._endpoint = attr
 		return self.api_call
 	
-	def set_access_token(self, access_token, access_token_secret):
-		self.access_token = access_token
-		self.access_token_secret = access_token_secret
-		self.user = self.verify_credentials()
-	
 	def parse_qs(self, qs):
 		return dict([(key, values[0]) for key, values in urlparse.parse_qs(qs).iteritems()])
 	
