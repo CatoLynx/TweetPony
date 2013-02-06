@@ -46,7 +46,7 @@ class KWArgDict(dict):
 			return dict.__getitem__(self, key)
 
 class API:
-	def __init__(self, consumer_key, consumer_secret, access_token = None, access_token_secret = None, host = "api.twitter.com", root = "/1.1/", oauth_host = "api.twitter.com", oauth_root = "/oauth/", secure = True):
+	def __init__(self, consumer_key, consumer_secret, access_token = None, access_token_secret = None, host = "api.twitter.com", root = "/1.1/", oauth_host = "api.twitter.com", oauth_root = "/oauth/", secure = True, timeout = None):
 		self.consumer_key = consumer_key
 		self.consumer_secret = consumer_secret
 		self.access_token = access_token
@@ -56,6 +56,7 @@ class API:
 		self.oauth_host = oauth_host
 		self.oauth_root = oauth_root
 		self.secure = secure
+		self.timeout = timeout
 		self._endpoint = None
 		self._multipart = False
 		self.user = self.verify_credentials() if self.access_token and self.access_token_secret else None
@@ -135,9 +136,9 @@ class API:
 		else:
 			full_url = url
 		if method.upper() == "POST":
-			response = requests.post(full_url, data = post, files = files, headers = header, stream = stream)
+			response = requests.post(full_url, data = post, files = files, headers = header, stream = stream, timeout = self.timeout)
 		else:
-			response = requests.get(full_url, data = post, files = files, headers = header, stream = stream)
+			response = requests.get(full_url, data = post, files = files, headers = header, stream = stream, timeout = self.timeout)
 		if response.status_code != 200:
 			try:
 				data = response.json()
@@ -293,7 +294,7 @@ class API:
 		
 		resp = self.do_request("POST" if data['post'] else "GET", url, get_data, post_data, files, stream = stream)
 		if stream:
-			for line in resp.iter_lines():
+			for line in resp.iter_lines(chunk_size = 64):
 				if not line:
 					continue
 				entity = self.parse_stream_entity(line)
