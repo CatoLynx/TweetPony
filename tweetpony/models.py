@@ -327,6 +327,38 @@ class Language(Model):
 class RateLimitStatus(Model):
 	pass
 
+class Event(Model):
+	@classmethod
+	def from_json(cls, data):
+		self = cls(Model.from_json(data))
+		for key, value in self.iteritems():
+			if key == 'target' or key == 'source':
+				value = User.from_json(value)
+			self[key] = value
+		if 'favorite' in self['event']:
+			self['target_object'] = Status.from_json(self['target_object'])
+		elif self['event'].startswith('list_'):
+			self['target_object'] = List.from_json(self['target_object'])
+		return self
+
+class DeletionEvent(Model):
+	pass
+
+class LocationDeletionEvent(Model):
+	pass
+
+class LimitEvent(Model):
+	pass
+
+class WithheldStatusEvent(Model):
+	pass
+
+class WithheldUserEvent(Model):
+	pass
+
+class DisconnectEvent(Model):
+	pass
+
 class PrivacyPolicy(str):
 	@classmethod
 	def from_json(cls, data):
