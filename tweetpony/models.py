@@ -32,13 +32,19 @@ class AttrDict(dict):
 				self[key] = value
 	
 	def __getattr__(self, name):
-		return self.__getitem__(name)
+		try:
+			return self.__getitem__(name)
+		except:
+			return dict.__getattr__(self, name)
 
 class Model(AttrDict):
 	api = PseudoAPI()
 	
 	def __getattr__(self, name):
-		return self.__getitem__(name)
+		try:
+			return self.__getitem__(name)
+		except:
+			return AttrDict.__getattr__(self, name)
 	
 	@classmethod
 	def from_json(cls, data):

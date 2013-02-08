@@ -45,7 +45,7 @@ class KWArgDict(dict):
 		else:
 			return dict.__getitem__(self, key)
 
-class API:
+class API(object):
 	def __init__(self, consumer_key, consumer_secret, access_token = None, access_token_secret = None, host = "api.twitter.com", root = "/1.1/", oauth_host = "api.twitter.com", oauth_root = "/oauth/", secure = True, timeout = None):
 		self.consumer_key = consumer_key
 		self.consumer_secret = consumer_secret
@@ -62,6 +62,8 @@ class API:
 		self.user = self.verify_credentials() if self.access_token and self.access_token_secret else None
 	
 	def __getattr__(self, attr):
+		if attr.startswith("__"):
+			return object.__getattr__(self, attr)
 		self._endpoint = attr
 		return self.api_call
 	
