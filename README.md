@@ -6,6 +6,12 @@ License
 -------
 This program is licensed under the AGPLv3. See the `LICENSE` file for more information.
 
+Installation
+------------
+You can easily install TweetPony using the Python Package Index. Just type:
+
+	sudo pip install tweetpony
+
 Usage basics
 ------------
 You can see the internal names of all the API endpoints in the file `endpoints.py`.

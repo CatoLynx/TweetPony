@@ -59,6 +59,8 @@ class API(object):
 		self.timeout = timeout
 		self._endpoint = None
 		self._multipart = False
+		self.request_token = None
+		self.request_token_secret = None
 		self.user = self.verify_credentials() if self.access_token and self.access_token_secret else None
 	
 	def __getattr__(self, attr):
@@ -71,6 +73,10 @@ class API(object):
 		self.access_token = access_token
 		self.access_token_secret = access_token_secret
 		self.user = self.verify_credentials()
+	
+	def set_request_token(self, request_token, request_token_secret):
+		self.request_token = request_token
+		self.request_token_secret = request_token_secret
 	
 	def parse_qs(self, qs):
 		return dict([(key, values[0]) for key, values in urlparse.parse_qs(qs).iteritems()])
@@ -86,7 +92,9 @@ class API(object):
 			'oauth_timestamp': str(int(time.time())),
 			'oauth_version': "1.0",
 		}
-		if self.access_token:
+		if self.request_token:
+			auth_data['oauth_token'] = self.request_token
+		elif self.access_token:
 			auth_data['oauth_token'] = self.access_token
 		return auth_data
 	
@@ -112,7 +120,12 @@ class API(object):
 		signature_base.append(urllib.quote(url, safe = "~"))
 		signature_base.append(urllib.quote(param_string, safe = "~"))
 		signature_base = "&".join(signature_base)
-		token_secret = urllib.quote(self.access_token_secret, safe = "~") if self.access_token_secret else ""
+		if self.request_token:
+			token_secret = urllib.quote(self.request_token_secret, safe = "~")
+		elif self.access_token:
+			token_secret = urllib.quote(self.access_token_secret, safe = "~")
+		else:
+			token_secret = ""
 		signing_key = "&".join([urllib.quote(self.consumer_secret, safe = "~"), token_secret])
 		signature = hmac.new(signing_key, signature_base, hashlib.sha1)
 		signature = urllib.quote(binascii.b2a_base64(signature.digest())[:-1], safe = "~")
@@ -163,9 +176,8 @@ class API(object):
 		url = self.build_request_url(self.oauth_root, 'request_token')
 		resp = self.do_request("GET", url, is_json = False)
 		token_data = self.parse_qs(resp)
-		self.access_token = token_data['oauth_token']
-		self.access_token_secret = token_data['oauth_token_secret']
-		return (self.access_token, self.access_token_secret)
+		self.set_request_token(token_data['oauth_token'], token_data['oauth_token_secret'])
+		return (self.request_token, self.request_token_secret)
 	
 	def get_auth_url(self, token = None):
 		if token is None:
@@ -174,18 +186,16 @@ class API(object):
 	
 	def authenticate(self, verifier):
 		url = self.build_request_url(self.oauth_root, 'access_token')
-		resp = self.do_request("GET", url, is_json = False)
+		resp = self.do_request("POST", url, post = {'oauth_verifier': verifier}, is_json = False)
 		token_data = self.parse_qs(resp)
-		self.access_token = token_data['oauth_token']
-		self.access_token_secret = token_data['oauth_token_secret']
-		self.user = self.verify_credentials()
+		self.set_access_token(token_data['oauth_token'], token_data['oauth_token_secret'])
 		return ((self.access_token, self.access_token_secret), token_data['user_id'], token_data['screen_name'])
 	
 	def parse_param(self, key, value):
 		if type(value) == bool:
 			value = "true" if value else "false"
 		elif type(value) == list:
-			value = ",".join(value)
+			value = ",".join([str(val) for val in value])
 		elif type(value) != str:
 			value = str(value)
 		if type(key) != str:
