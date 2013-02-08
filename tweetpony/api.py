@@ -196,7 +196,7 @@ class API(object):
 			value = "true" if value else "false"
 		elif type(value) == list:
 			value = ",".join([str(val) for val in value])
-		elif type(value) != str:
+		elif type(value) != str and value is not None:
 			value = str(value)
 		if type(key) != str:
 			key = str(key)
@@ -206,7 +206,7 @@ class API(object):
 		files = {}
 		_params = dict(params.items())
 		for key, value in params.iteritems():
-			if value is None:
+			if value in [None, []]:
 				del _params[key]
 			if key == 'image' or key == 'media' or key == 'banner':
 				del _params[key]
@@ -312,7 +312,7 @@ class API(object):
 		
 		resp = self.do_request("POST" if data['post'] else "GET", url, get_data, post_data, files, stream = stream)
 		if stream:
-			for line in resp.iter_lines(chunk_size = 64):
+			for line in resp.iter_lines(chunk_size = 1):
 				if not line:
 					continue
 				entity = self.parse_stream_entity(line)

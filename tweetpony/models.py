@@ -229,6 +229,12 @@ class OEmbed(Model):
 class Relationship(Model):
 	@classmethod
 	def from_json(cls, data):
+		self = cls(Model.from_json(data['relationship']))
+		return self
+
+class SimpleRelationship(Model):
+	@classmethod
+	def from_json(cls, data):
 		self = cls(Model.from_json(data))
 		tmp = cls()
 		for key, value in self.iteritems():
@@ -410,6 +416,9 @@ class IDCollection(list):
 
 class RelationshipCollection(ModelCollection):
 	model = Relationship
+
+class SimpleRelationshipCollection(ModelCollection):
+	model = SimpleRelationship
 
 class ListCollection(ModelCollection):
 	model = List

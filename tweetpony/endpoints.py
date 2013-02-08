@@ -170,7 +170,7 @@ ENDPOINTS = {
 		'url_params': [],
 		'required_params': [],
 		'optional_params': ['screen_name', 'user_id'],
-		'model': RelationshipCollection,
+		'model': SimpleRelationshipCollection,
 	},
 	'received_follower_requests': {
 		'endpoint': "friendships/incoming.json",
