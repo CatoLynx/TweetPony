@@ -1,8 +1,15 @@
 # Copyright (C) 2013 Julian Metzler
 # See the LICENSE file for the full license.
 
+import locale
 import utils
 from datetime import datetime
+
+def strptime(string, fmt = '%a %b %d %H:%M:%S +0000 %Y'):
+	locale.setlocale(locale.LC_TIME, 'C')
+	value = datetime.strptime(string, fmt)
+	locale.setlocale(locale.LC_TIME, '')
+	return value
 
 class PseudoAPI:
 	def __getattr__(self, name):
@@ -87,7 +94,7 @@ class Status(Model):
 		tmp = cls()
 		for key, value in self.iteritems():
 			if key == 'created_at':
-				value = datetime.strptime(value, '%a %b %d %H:%M:%S +0000 %Y')
+				value = strptime(value)
 			elif key == 'user':
 				value = User.from_json(value)
 			elif key == 'source':
@@ -128,7 +135,7 @@ class User(Model):
 		self = cls(Model.from_json(data))
 		for key, value in self.iteritems():
 			if key == 'created_at':
-				value = datetime.strptime(value, '%a %b %d %H:%M:%S +0000 %Y')
+				value = strptime(value)
 			elif key == 'status':
 				value = Status.from_json(value)
 			self[key] = value
@@ -198,7 +205,7 @@ class Message(Model):
 		self = cls(Model.from_json(data))
 		for key, value in self.iteritems():
 			if key == 'created_at':
-				value = datetime.strptime(value, '%a %b %d %H:%M:%S +0000 %Y')
+				value = strptime(value)
 			elif key == 'sender' or key == 'receiver':
 				value = User.from_json(value)
 			self[key] = value
@@ -239,7 +246,7 @@ class List(Model):
 		self = cls(Model.from_json(data))
 		for key, value in self.iteritems():
 			if key == 'created_at':
-				value = datetime.strptime(value, '%a %b %d %H:%M:%S +0000 %Y')
+				value = strptime(value)
 			elif key == 'user':
 				value = User.from_json(value)
 			self[key] = value
@@ -269,7 +276,7 @@ class SavedSearch(Model):
 		self = cls(Model.from_json(data))
 		for key, value in self.iteritems():
 			if key == 'created_at':
-				value = datetime.strptime(value, '%a %b %d %H:%M:%S +0000 %Y')
+				value = strptime(value)
 			self[key] = value
 		return self
 	

@@ -4,7 +4,7 @@
 from models import *
 
 ENDPOINTS = {
-	'mentions_timeline': {
+	'mentions': {
 		'endpoint': "statuses/mentions_timeline.json",
 		'post': False,
 		'url_params': [],

@@ -182,6 +182,12 @@ class API:
 	def parse_param(self, key, value):
 		if type(value) == bool:
 			value = "true" if value else "false"
+		elif type(value) == list:
+			value = ",".join(value)
+		elif type(value) != str:
+			value = str(value)
+		if type(key) != str:
+			key = str(key)
 		return (key, value)
 	
 	def parse_params(self, params):
