@@ -172,7 +172,7 @@ class API(object):
 		else:
 			return response.text
 	
-	def request_token(self):
+	def get_request_token(self):
 		url = self.build_request_url(self.oauth_root, 'request_token')
 		resp = self.do_request("GET", url, is_json = False)
 		token_data = self.parse_qs(resp)
@@ -181,7 +181,7 @@ class API(object):
 	
 	def get_auth_url(self, token = None):
 		if token is None:
-			token, secret = self.request_token()
+			token, secret = self.get_request_token()
 		return self.build_request_url(self.oauth_root, 'authenticate', {'oauth_token': token})
 	
 	def authenticate(self, verifier):
