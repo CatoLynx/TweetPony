@@ -196,10 +196,8 @@ class API(object):
 			value = "true" if value else "false"
 		elif type(value) == list:
 			value = ",".join([str(val) for val in value])
-		elif type(value) != str and value is not None:
-			value = str(value)
-		if type(key) != str:
-			key = str(key)
+		elif type(value) not in [str, unicode] and value is not None:
+			value = unicode(value)
 		return (key, value)
 	
 	def parse_params(self, params):

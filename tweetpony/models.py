@@ -32,10 +32,7 @@ class AttrDict(dict):
 				self[key] = value
 	
 	def __getattr__(self, name):
-		try:
-			return self.__getitem__(name)
-		except:
-			return dict.__getattr__(self, name)
+		return self.__getitem__(name)
 
 class Model(AttrDict):
 	api = PseudoAPI()
