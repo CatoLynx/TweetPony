@@ -157,7 +157,10 @@ class API(object):
 		if response.status_code != 200:
 			try:
 				data = response.json()
-				raise APIError(code = data['errors'][0]['code'], description = data['errors'][0]['message'])
+				try:
+					raise APIError(code = data['errors'][0]['code'], description = data['errors'][0]['message'])
+				except TypeError:
+					raise APIError(code = -1, description = data['errors'])
 			except APIError:
 				raise
 			except:
