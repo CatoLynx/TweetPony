@@ -1,6 +1,7 @@
 # Copyright (C) 2013 Julian Metzler
 # See the LICENSE file for the full license.
 
+import json
 import locale
 import utils
 from datetime import datetime
@@ -46,7 +47,7 @@ class Model(AttrDict):
 	@classmethod
 	def from_json(cls, data):
 		self = cls(data)
-		setattr(self, 'json', data)
+		self['json'] = json.dumps(data)
 		return self
 	
 	def connect_api(self, api):
@@ -95,6 +96,7 @@ class Status(Model):
 	def from_json(cls, data):
 		self = cls(Model.from_json(data))
 		tmp = cls()
+		tmp['json'] = json.dumps(data)
 		for key, value in self.iteritems():
 			if key == 'created_at':
 				value = strptime(value)
@@ -234,6 +236,7 @@ class SimpleRelationship(Model):
 	def from_json(cls, data):
 		self = cls(Model.from_json(data))
 		tmp = cls()
+		tmp['json'] = json.dumps(data)
 		for key, value in self.iteritems():
 			if key == 'connections':
 				tmp['followed_by'] = 'followed_by' in value
