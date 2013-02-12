@@ -15,6 +15,7 @@ from threading import Thread
 
 from endpoints import *
 from models import *
+from utils import quote
 
 class APIError(Exception):
 	def __init__(self, code, description):
@@ -109,7 +110,7 @@ class API(object):
 			get_data = []
 			post_data = []
 		auth_data = self.get_oauth_header_data().items()
-		data = [(urllib.quote(key, safe = "~"), urllib.quote(value, safe = "~")) for key, value in get_data + post_data + auth_data]
+		data = [(quote(key, safe = "~"), quote(value, safe = "~")) for key, value in get_data + post_data + auth_data]
 		data = sorted(sorted(data), key = lambda item: item[0].upper())
 		param_string = []
 		for key, value in data:
@@ -117,18 +118,18 @@ class API(object):
 		param_string = "&".join(param_string)
 		signature_base = []
 		signature_base.append(method.upper())
-		signature_base.append(urllib.quote(url, safe = "~"))
-		signature_base.append(urllib.quote(param_string, safe = "~"))
+		signature_base.append(quote(url, safe = "~"))
+		signature_base.append(quote(param_string, safe = "~"))
 		signature_base = "&".join(signature_base)
 		if self.request_token:
-			token_secret = urllib.quote(self.request_token_secret, safe = "~")
+			token_secret = quote(self.request_token_secret, safe = "~")
 		elif self.access_token:
-			token_secret = urllib.quote(self.access_token_secret, safe = "~")
+			token_secret = quote(self.access_token_secret, safe = "~")
 		else:
 			token_secret = ""
-		signing_key = "&".join([urllib.quote(self.consumer_secret, safe = "~"), token_secret])
+		signing_key = "&".join([quote(self.consumer_secret, safe = "~"), token_secret])
 		signature = hmac.new(signing_key, signature_base, hashlib.sha1)
-		signature = urllib.quote(binascii.b2a_base64(signature.digest())[:-1], safe = "~")
+		signature = quote(binascii.b2a_base64(signature.digest())[:-1], safe = "~")
 		auth_data.append(('oauth_signature', signature))
 		return self.generate_oauth_header(dict(auth_data))
 	
