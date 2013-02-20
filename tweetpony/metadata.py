@@ -7,5 +7,6 @@ description = "A Twitter library for Python"
 license = "AGPLv3"
 author = "Julian Metzler"
 author_email = "contact@mezgrman.de"
+dependencies = ['requests']
 url = "https://github.com/Mezgrman/TweetPony"
 keywords = "twitter library api wrapper pony"
