@@ -33,7 +33,10 @@ class AttrDict(dict):
 				self[key] = value
 	
 	def __getattr__(self, name):
-		return self.__getitem__(name)
+		try:
+			return self.__getitem__(name)
+		except KeyError:
+			raise AttributeError
 
 class Model(AttrDict):
 	api = PseudoAPI()
