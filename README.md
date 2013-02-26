@@ -62,7 +62,7 @@ An `APIError` instance has the following attributes:
 Models
 ------
 Almost every API call (except for the ones that return only a list or something equally simple) will return a parsed model instance representing the response data.
-There are `User`, `Status`, `Message`, `List` and `APIError` models.
+There are `User`, `Status`, `Message`, `List`, `APIError` and many more models.
 You can access the response data as instance attributes like `status.text` or using a dictionary lookup like `status['text']`.
 
 Authentication
