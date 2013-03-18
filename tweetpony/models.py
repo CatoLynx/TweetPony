@@ -215,7 +215,7 @@ class Message(Model):
 		for key, value in self.iteritems():
 			if key == 'created_at':
 				value = strptime(value)
-			elif key == 'sender' or key == 'receiver':
+			elif key == 'sender' or key == 'recipient':
 				value = User.from_json(value)
 			self[key] = value
 		return self
