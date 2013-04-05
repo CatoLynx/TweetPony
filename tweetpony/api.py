@@ -7,30 +7,19 @@ import hashlib
 import hmac
 import json
 import random
-import requests
+try:
+	import requests
+except ImportError:
+	raise ImportError("It seems like you don't have the 'requests' module installed which is required for TweetPony to work. Please install it first.")
 import time
 import urllib
 import urlparse
 from threading import Thread
 
 from endpoints import *
+from error import *
 from models import *
 from utils import quote
-
-class APIError(Exception):
-	def __init__(self, code, description):
-		self.code = code
-		self.description = description
-	
-	def __str__(self):
-		return "#%i: %s" % (self.code, self.description)
-
-class ParameterError(Exception):
-	def __init__(self, description):
-		self.description = description
-	
-	def __str__(self):
-		return self.description
 
 class ArgList(tuple):
 	def __getitem__(self, index):
@@ -93,10 +82,10 @@ class API(object):
 			'oauth_timestamp': str(int(time.time())),
 			'oauth_version': "1.0",
 		}
-		if self.request_token:
-			auth_data['oauth_token'] = self.request_token
-		elif self.access_token:
+		if self.access_token:
 			auth_data['oauth_token'] = self.access_token
+		elif self.request_token:
+			auth_data['oauth_token'] = self.request_token
 		return auth_data
 	
 	def generate_oauth_header(self, auth_data):
@@ -151,10 +140,26 @@ class API(object):
 			full_url = url + "?" + urllib.urlencode(get)
 		else:
 			full_url = url
+		"""# DEBUG
+		info = "=" * 50 + "\n"
+		info += "Method:    %s\n" % method
+		info += "URL:       %s\n" % full_url
+		info += "Headers:   %s\n" % str(header)
+		info += "GET data:  %s\n" % str(get)
+		info += "POST data: %s\n" % str(post)
+		info += "Files:     %s\n" % str(files)
+		info += "Streaming: %s\n" % str(stream)
+		info += "JSON:      %s\n" % str(is_json)
+		info += "=" * 50
+		print info
+		# END DEBUG"""
 		if method.upper() == "POST":
 			response = requests.post(full_url, data = post, files = files, headers = header, stream = stream, timeout = self.timeout)
 		else:
 			response = requests.get(full_url, data = post, files = files, headers = header, stream = stream, timeout = self.timeout)
+		"""# DEBUG
+		print ("\nResponse:  %s\n" % response.text) + "=" * 50
+		# END DEBUG"""
 		if response.status_code != 200:
 			try:
 				data = response.json()
@@ -192,6 +197,7 @@ class API(object):
 		url = self.build_request_url(self.oauth_root, 'access_token')
 		resp = self.do_request("POST", url, post = {'oauth_verifier': verifier}, is_json = False)
 		token_data = self.parse_qs(resp)
+		self.set_request_token(None, None)
 		self.set_access_token(token_data['oauth_token'], token_data['oauth_token_secret'])
 		return ((self.access_token, self.access_token_secret), token_data['user_id'], token_data['screen_name'])
 	

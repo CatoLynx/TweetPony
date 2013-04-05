@@ -5,7 +5,7 @@ import json
 import locale
 import utils
 from datetime import datetime
-from api import ParameterError
+from error import ParameterError
 
 def strptime(string, fmt = '%a %b %d %H:%M:%S +0000 %Y'):
 	locale.setlocale(locale.LC_TIME, 'C')
@@ -89,6 +89,15 @@ class MixedModelCollection(Model):
 		for item in self.get(self.model_key, []):
 			if hasattr(item, 'connect_api'):
 				item.connect_api(api)
+
+	def __len__(self):
+		return len(self.get(self.model_key, []))
+
+	def __getitem__(self, descriptor):
+		if type(descriptor) in [str, unicode]:
+			return Model.__getitem__(self, descriptor)
+		else:
+			return self.get(self.model_key, []).__getitem__(descriptor)
 
 class CursoredModelCollection(MixedModelCollection):
 	pass
