@@ -78,7 +78,6 @@ ENDPOINTS = {
 	},
 	'update_status_with_media': {
 		'endpoint': "statuses/update_with_media.json",
-		'host': "upload.twitter.com",
 		'post': True,
 		'url_params': [],
 		'required_params': ['status', 'media[]'],
