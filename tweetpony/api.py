@@ -313,7 +313,7 @@ class API(object):
 			get_data = kwargs
 			post_data = None
 		
-		if stream:
+		if 'host' in data:
 			url = self.build_request_url(self.root, endpoint, host = data['host'])
 		else:
 			url = self.build_request_url(self.root, endpoint)
