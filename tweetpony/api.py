@@ -217,6 +217,11 @@ class API(object):
 			if value in [None, []]:
 				del _params[key]
 			if key == 'image' or key == 'media' or key == 'banner':
+				if type(value) is file:
+					try:
+						value.seek(0)
+					except ValueError:
+						pass
 				del _params[key]
 				if key == 'media':
 					key = 'media[]'
