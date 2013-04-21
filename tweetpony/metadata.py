@@ -2,7 +2,7 @@
 # See the LICENSE file for the full license.
 
 name = "TweetPony"
-version = "1.0.10"
+version = "1.2.0"
 description = "A Twitter library for Python"
 license = "AGPLv3"
 author = "Julian Metzler"

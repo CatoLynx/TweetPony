@@ -74,7 +74,7 @@ class API(object):
 	def oauth_generate_nonce(self):
 		return base64.b64encode(hashlib.sha1(str(random.getrandbits(256))).digest(), random.choice(['rA','aZ','gQ','hH','hG','aR','DD'])).rstrip('==')
 	
-	def get_oauth_header_data(self):
+	def get_oauth_header_data(self, callback_url = None):
 		auth_data = {
 			'oauth_consumer_key': self.consumer_key,
 			'oauth_nonce': self.oauth_generate_nonce(),
@@ -82,6 +82,8 @@ class API(object):
 			'oauth_timestamp': str(int(time.time())),
 			'oauth_version': "1.0",
 		}
+		if callback_url:
+			auth_data['oauth_callback'] = callback_url
 		if self.access_token:
 			auth_data['oauth_token'] = self.access_token
 		elif self.request_token:
@@ -91,14 +93,14 @@ class API(object):
 	def generate_oauth_header(self, auth_data):
 		return {'Authorization': "OAuth %s" % ", ".join(['%s="%s"' % item for item in auth_data.items()])}
 	
-	def get_oauth_header(self, method, url, get = None, post = None):
+	def get_oauth_header(self, method, url, callback_url = None, get = None, post = None):
 		if not self._multipart:
 			get_data = (get or {}).items()
 			post_data = (post or {}).items()
 		else:
 			get_data = []
 			post_data = []
-		auth_data = self.get_oauth_header_data().items()
+		auth_data = self.get_oauth_header_data(callback_url = callback_url).items()
 		data = [(quote(key, safe = "~"), quote(value, safe = "~")) for key, value in get_data + post_data + auth_data]
 		data = sorted(sorted(data), key = lambda item: item[0].upper())
 		param_string = []
@@ -131,16 +133,16 @@ class API(object):
 			url += "?%s" % qs
 		return url
 	
-	def do_request(self, method, url, get = None, post = None, files = None, stream = False, is_json = True):
+	def do_request(self, method, url, callback_url = None, get = None, post = None, files = None, stream = False, is_json = True):
 		if files == {}:
 			files = None
 		self._multipart = files is not None
-		header = self.get_oauth_header(method, url, get, post)
+		header = self.get_oauth_header(method, url, callback_url, get, post)
 		if get:
 			full_url = url + "?" + urllib.urlencode(get)
 		else:
 			full_url = url
-		"""# DEBUG
+		# DEBUG
 		info = "=" * 50 + "\n"
 		info += "Method:    %s\n" % method
 		info += "URL:       %s\n" % full_url
@@ -152,14 +154,14 @@ class API(object):
 		info += "JSON:      %s\n" % str(is_json)
 		info += "=" * 50
 		print info
-		# END DEBUG"""
+		# END DEBUG
 		if method.upper() == "POST":
 			response = requests.post(full_url, data = post, files = files, headers = header, stream = stream, timeout = self.timeout)
 		else:
 			response = requests.get(full_url, data = post, files = files, headers = header, stream = stream, timeout = self.timeout)
-		"""# DEBUG
+		# DEBUG
 		print ("\nResponse:  %s\n" % response.text) + "=" * 50
-		# END DEBUG"""
+		# END DEBUG
 		if response.status_code != 200:
 			try:
 				data = response.json()
@@ -181,16 +183,16 @@ class API(object):
 		else:
 			return response.text
 	
-	def get_request_token(self):
+	def get_request_token(self, callback_url = None):
 		url = self.build_request_url(self.oauth_root, 'request_token')
-		resp = self.do_request("GET", url, is_json = False)
+		resp = self.do_request("GET", url, callback_url, is_json = False)
 		token_data = self.parse_qs(resp)
 		self.set_request_token(token_data['oauth_token'], token_data['oauth_token_secret'])
 		return (self.request_token, self.request_token_secret)
 	
-	def get_auth_url(self, token = None):
+	def get_auth_url(self, callback_url = None, token = None):
 		if token is None:
-			token, secret = self.get_request_token()
+			token, secret = self.get_request_token(callback_url)
 		return self.build_request_url(self.oauth_root, 'authenticate', {'oauth_token': token})
 	
 	def authenticate(self, verifier):
@@ -216,7 +218,7 @@ class API(object):
 		for key, value in params.iteritems():
 			if value in [None, []]:
 				del _params[key]
-			if key == 'image' or key == 'media' or key == 'banner':
+			if key in ['image', 'media', 'banner']:
 				if type(value) is file:
 					try:
 						value.seek(0)
