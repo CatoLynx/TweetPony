@@ -142,7 +142,7 @@ class API(object):
 			full_url = url + "?" + urllib.urlencode(get)
 		else:
 			full_url = url
-		# DEBUG
+		"""# DEBUG
 		info = "=" * 50 + "\n"
 		info += "Method:    %s\n" % method
 		info += "URL:       %s\n" % full_url
@@ -154,14 +154,14 @@ class API(object):
 		info += "JSON:      %s\n" % str(is_json)
 		info += "=" * 50
 		print info
-		# END DEBUG
+		# END DEBUG"""
 		if method.upper() == "POST":
 			response = requests.post(full_url, data = post, files = files, headers = header, stream = stream, timeout = self.timeout)
 		else:
 			response = requests.get(full_url, data = post, files = files, headers = header, stream = stream, timeout = self.timeout)
-		# DEBUG
+		"""# DEBUG
 		print ("\nResponse:  %s\n" % response.text) + "=" * 50
-		# END DEBUG
+		# END DEBUG"""
 		if response.status_code != 200:
 			try:
 				data = response.json()
@@ -188,11 +188,14 @@ class API(object):
 		resp = self.do_request("GET", url, callback_url, is_json = False)
 		token_data = self.parse_qs(resp)
 		self.set_request_token(token_data['oauth_token'], token_data['oauth_token_secret'])
-		return (self.request_token, self.request_token_secret)
+		return (self.request_token, self.request_token_secret, token_data.get('oauth_callback_confirmed'))
 	
 	def get_auth_url(self, callback_url = None, token = None):
 		if token is None:
-			token, secret = self.get_request_token(callback_url)
+			token, secret, callback_confirmed = self.get_request_token(callback_url)
+		print callback_url, callback_confirmed
+		if callback_url and not callback_confirmed:
+			raise APIError(code = -1, description = "OAuth callback not confirmed")
 		return self.build_request_url(self.oauth_root, 'authenticate', {'oauth_token': token})
 	
 	def authenticate(self, verifier):
@@ -325,7 +328,7 @@ class API(object):
 		else:
 			url = self.build_request_url(self.root, endpoint)
 		
-		resp = self.do_request("POST" if data['post'] else "GET", url, get_data, post_data, files, stream = stream)
+		resp = self.do_request("POST" if data['post'] else "GET", url, get = get_data, post = post_data, files = files, stream = stream)
 		if stream:
 			for line in resp.iter_lines(chunk_size = 1):
 				if not line:
