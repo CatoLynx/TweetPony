@@ -13,9 +13,13 @@ def strptime(string, fmt = '%a %b %d %H:%M:%S +0000 %Y'):
 	locale.setlocale(locale.LC_TIME, '')
 	return value
 
-class PseudoAPI:
+class DummyAPI:
 	def __getattr__(self, name):
 		raise NotImplementedError("This model does not have an API instance associated with it.")
+
+class DummyUser:
+	def __getattr__(self, name):
+		raise NotImplementedError("This API instance does not have verified credentials and thus did not load the authenticating user's profile.")
 
 class AttrDict(dict):
 	def __init__(self, data = None):
@@ -40,7 +44,7 @@ class AttrDict(dict):
 			raise AttributeError
 
 class Model(AttrDict):
-	api = PseudoAPI()
+	api = DummyAPI()
 	
 	def __getattr__(self, name):
 		try:

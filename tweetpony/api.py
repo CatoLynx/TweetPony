@@ -36,7 +36,7 @@ class KWArgDict(dict):
 			return dict.__getitem__(self, key)
 
 class API(object):
-	def __init__(self, consumer_key, consumer_secret, access_token = None, access_token_secret = None, host = "api.twitter.com", root = "/1.1/", oauth_host = "api.twitter.com", oauth_root = "/oauth/", secure = True, timeout = None):
+	def __init__(self, consumer_key, consumer_secret, access_token = None, access_token_secret = None, host = "api.twitter.com", root = "/1.1/", oauth_host = "api.twitter.com", oauth_root = "/oauth/", secure = True, timeout = None, load_user = True):
 		self.consumer_key = consumer_key
 		self.consumer_secret = consumer_secret
 		self.access_token = access_token
@@ -47,11 +47,12 @@ class API(object):
 		self.oauth_root = oauth_root
 		self.secure = secure
 		self.timeout = timeout
+		self.load_user = load_user
 		self._endpoint = None
 		self._multipart = False
 		self.request_token = None
 		self.request_token_secret = None
-		self.user = self.verify_credentials() if self.access_token and self.access_token_secret else None
+		self.user = self.verify_credentials() if self.load_user and self.access_token and self.access_token_secret else DummyUser()
 	
 	def __getattr__(self, attr):
 		if attr.startswith("__"):
@@ -62,6 +63,10 @@ class API(object):
 	def set_access_token(self, access_token, access_token_secret):
 		self.access_token = access_token
 		self.access_token_secret = access_token_secret
+		if self.load_user:
+			self.verify()
+	
+	def verify(self):
 		self.user = self.verify_credentials()
 	
 	def set_request_token(self, request_token, request_token_secret):

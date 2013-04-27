@@ -741,7 +741,7 @@ STREAM_ENDPOINTS = {
 		'post': True,
 		'url_params': [],
 		'required_params': [],
-		'optional_params': ['follow', 'track', 'locations', 'stall_warnings'],
+		'optional_params': ['follow', 'track', 'locations', 'stall_warnings', 'language', 'filter_level'],
 	},
 	'sample_stream': {
 		'endpoint': "statuses/sample.json",
@@ -749,7 +749,7 @@ STREAM_ENDPOINTS = {
 		'post': False,
 		'url_params': [],
 		'required_params': [],
-		'optional_params': ['stall_warnings'],
+		'optional_params': ['stall_warnings', 'language', 'filter_level'],
 	},
 	'firehose_stream': {
 		'endpoint': "statuses/firehose.json",
@@ -757,7 +757,7 @@ STREAM_ENDPOINTS = {
 		'post': False,
 		'url_params': [],
 		'required_params': [],
-		'optional_params': ['count', 'stall_warnings'],
+		'optional_params': ['count', 'stall_warnings', 'language', 'filter_level'],
 	},
 	'user_stream': {
 		'endpoint': "user.json",
