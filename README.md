@@ -77,18 +77,26 @@ The authentication flow works like this:
 	api.authenticate(code)
 
 After you've done this, the access token and access token secret can be obtained from the `API` instance as `api.access_token` and `api.access_token_secret`.
+By default, TweetPony loads the authenticating user's profile as soon as all four authentication tokens are present. This is also a way of checking whether these tokens are correct. If you do not want the user to be loaded, pass `load_user = False` to the `API` constructor.
+This is useful if:
+* you want to save API calls
+* you can be sure that the access tokens are correct
+* you don't need the user profile (if you do, you can still load it using the `verify` function of the `API` instance)
 
 Usage example
 -------------
+This is a simple example script. More can be found in the `examples` directory.
 
-	import tweetpony
-	api = tweetpony.API(consumer_key = "abc", consumer_secret = "def", access_token = "ghi", access_token_secret = "jkl")
-	user = api.user
-	print "Hello, @%s!" % user.screen_name
-	text = raw_input("What would you like to tweet? ")
-	try:
-		api.update_status(status = text)
-	except tweetpony.APIError as err:
-		print "Oops, something went wrong! Twitter returned error #%i and said: %s" % (err.code, err.description)
-	else:
-		print "Yay! Your tweet has been sent!"
+```python
+import tweetpony
+api = tweetpony.API(consumer_key = "abc", consumer_secret = "def", access_token = "ghi", access_token_secret = "jkl")
+user = api.user
+print "Hello, @%s!" % user.screen_name
+text = raw_input("What would you like to tweet? ")
+try:
+	api.update_status(status = text)
+except tweetpony.APIError as err:
+	print "Oops, something went wrong! Twitter returned error #%i and said: %s" % (err.code, err.description)
+else:
+	print "Yay! Your tweet has been sent!"
+```

@@ -198,7 +198,6 @@ class API(object):
 	def get_auth_url(self, callback_url = None, token = None):
 		if token is None:
 			token, secret, callback_confirmed = self.get_request_token(callback_url)
-		print callback_url, callback_confirmed
 		if callback_url and not callback_confirmed:
 			raise APIError(code = -1, description = "OAuth callback not confirmed")
 		return self.build_request_url(self.oauth_root, 'authenticate', {'oauth_token': token})
