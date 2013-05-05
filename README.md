@@ -17,31 +17,41 @@ Usage basics
 You can see the internal names of all the API endpoints in the file `endpoints.py`.
 For example, to update your status, you would do:
 
-	status = api.update_status(status = "Hello world!")
+```python
+status = api.update_status(status = "Hello world!")
+```
 
 All the parameter names are the same as in the API documentation. Values will be automatically converted to their correct representation. For example, the boolean `True` will become the string `true`.
 
 TweetPony has an internal model system which lets you perform actions related to the model quite easily!
 Suppose you have a `Status` model:
 
-	status = api.get_status(id = 12345)
+```python
+status = api.get_status(id = 12345)
+```
 
 Now if you want to favorite this status, you would probably do this:
 
-	api.favorite(id = status.id)
+```python
+api.favorite(id = status.id)
+```
 
 But TweetPony makes this easier! You can just do:
 
-	status.favorite()
+```python
+status.favorite()
+```
 
 and the pony will favorite the tweet!
 Of course, this will only work if you obtained the `Status` instance through an API call, which should be the case 99% of the time. It won't work if you create the `Status` instance directly from a dictionary. But why would you do that?
 You can also manually connect an `API` instance to a model instance by using the model's `connect_api` method.
 For example, if you have two `API` instances (e.g. for two different users) and want to fetch a tweet with the first user's account and retweet it with the second user's account, you do:
 
-	status = api1.get_status(id = 12345)
-	status.connect_api(api2)
-	status.retweet()
+```python
+status = api1.get_status(id = 12345)
+status.connect_api(api2)
+status.retweet()
+```
 
 Look into `models.py` to see which methods exist for which models.
 
@@ -70,11 +80,13 @@ Authentication
 You can either pass your access token and access token secret when initializing the API instance or go through the normal authentication flow.
 The authentication flow works like this:
 
-	api = tweetpony.API(consumer_key = "abc", consumer_secret = "def")
-	auth_url = api.get_auth_url()
-	print "Open this link to obtain your authentication code: %s" % auth_url
-	code = raw_input("Please enter your authentication code: ")
-	api.authenticate(code)
+```python
+api = tweetpony.API(consumer_key = "abc", consumer_secret = "def")
+auth_url = api.get_auth_url()
+print "Open this link to obtain your authentication code: %s" % auth_url
+code = raw_input("Please enter your authentication code: ")
+api.authenticate(code)
+```
 
 After you've done this, the access token and access token secret can be obtained from the `API` instance as `api.access_token` and `api.access_token_secret`.
 By default, TweetPony loads the authenticating user's profile as soon as all four authentication tokens are present. This is also a way of checking whether these tokens are correct. If you do not want the user to be loaded, pass `load_user = False` to the `API` constructor.

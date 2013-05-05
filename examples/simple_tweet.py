@@ -3,20 +3,16 @@
 # See the LICENSE file for the full license.
 
 """
-This script authenticates the user and asks for something to tweet.
+This script asks for something to tweet.
 """
 
+from _common import get_api
 import tweetpony
 
 def main():
-	try:
-		api = tweetpony.API(tweetpony.CONSUMER_KEY, tweetpony.CONSUMER_SECRET)
-		url = api.get_auth_url()
-		print "Visit this URL to obtain your verification code: %s" % url
-		verifier = raw_input("Input your code: ")
-		api.authenticate(verifier)
-	except tweetpony.APIError as err:
-		print "Oh no! You could not be authenticated. Twitter returned error #%i and said: %s" % (err.code, err.description)
+	api = get_api()
+	if not api:
+		return
 	tweet = raw_input("Hello, %s! Compose a tweet: " % api.user.screen_name)
 	try:
 		status = api.update_status(status = tweet)

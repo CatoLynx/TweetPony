@@ -75,6 +75,13 @@ class ModelCollection(list):
 		for item in self:
 			if hasattr(item, 'connect_api'):
 				item.connect_api(api)
+	
+	def __iter__(self):
+		self._iterator = list.__iter__(self)
+		return self._iterator
+	
+	def next(self):
+		return self._iterator.next()
 
 class MixedModelCollection(Model):
 	model_key = 'models'
@@ -82,6 +89,8 @@ class MixedModelCollection(Model):
 	
 	@classmethod
 	def from_json(cls, data):
+		if type(data) is list and len(data) == 1:
+			data = data[0]
 		self = cls(Model.from_json(data))
 		for key, value in self.iteritems():
 			if key == self.model_key:
@@ -102,6 +111,12 @@ class MixedModelCollection(Model):
 			return Model.__getitem__(self, descriptor)
 		else:
 			return self.get(self.model_key, []).__getitem__(descriptor)
+	
+	def __iter__(self):
+		return self.get(self.model_key, []).__iter__()
+	
+	def next(self):
+		return self.get(self.model_key, []).next()
 
 class CursoredModelCollection(MixedModelCollection):
 	pass
@@ -246,6 +261,8 @@ class Relationship(Model):
 	@classmethod
 	def from_json(cls, data):
 		self = cls(Model.from_json(data['relationship']))
+		self['following'] = self['source']['following']
+		self['followed_by'] = self['source']['followed_by']
 		return self
 
 class SimpleRelationship(Model):
@@ -340,16 +357,6 @@ class PlaceSearchResult(Model):
 
 class Trend(Model):
 	pass
-
-class Trends(Model):
-	@classmethod
-	def from_json(cls, data):
-		self = cls(Model.from_json(data[0]))
-		for key, value in self.iteritems():
-			if key == 'trends':
-				value = TrendCollection.from_json(value)
-			self[key] = value
-		return self
 
 class TrendLocation(Model):
 	pass
@@ -462,6 +469,10 @@ class SearchResult(MixedModelCollection):
 class Category(MixedModelCollection):
 	model_key = 'users'
 	collection = UserCollection
+
+class Trends(MixedModelCollection):
+	model_key = 'trends'
+	collection = TrendCollection
 
 class CursoredIDCollection(CursoredModelCollection):
 	model_key = 'ids'
