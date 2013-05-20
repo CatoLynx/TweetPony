@@ -231,6 +231,8 @@ class API(object):
 						value.seek(0)
 					except ValueError:
 						pass
+				elif type(value) in [str, unicode]:
+					value = open(value, 'r')
 				del _params[key]
 				if key == 'media':
 					key = 'media[]'
