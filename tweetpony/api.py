@@ -177,7 +177,8 @@ class API(object):
 			except APIError:
 				raise
 			except:
-				raise APIError(code = response.status_code, description = " ".join(response.headers['status'].split()[1:]))
+				description = " ".join(response.headers['status'].split()[1:]) if response.headers['status'] else "Unknown Error"
+				raise APIError(code = response.status_code, description = description)
 		if stream:
 			return response
 		if is_json:
