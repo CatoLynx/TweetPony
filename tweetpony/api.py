@@ -197,6 +197,7 @@ class API(object):
 		return (self.request_token, self.request_token_secret, token_data.get('oauth_callback_confirmed'))
 	
 	def get_auth_url(self, callback_url = None, token = None):
+		self.set_request_token(None, None)
 		if token is None:
 			token, secret, callback_confirmed = self.get_request_token(callback_url)
 		if callback_url and not callback_confirmed:
