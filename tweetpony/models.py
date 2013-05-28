@@ -134,6 +134,8 @@ class Status(Model):
 				value = strptime(value)
 			elif key == 'user':
 				value = User.from_json(value)
+			elif key == 'retweeted_status':
+				value = Status.from_json(value)
 			elif key == 'source':
 				try:
 					tmp[u'source_url'] = value.split('"')[1]
