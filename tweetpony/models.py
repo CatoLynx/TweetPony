@@ -55,10 +55,13 @@ class Model(AttrDict):
 	@classmethod
 	def from_json(cls, data):
 		self = cls(data)
+		self['json'] = json.dumps(data)
 		return self
 	
 	def connect_api(self, api):
 		self.api = api
+		if not api.json_in_models:
+			del self['json']
 
 class ModelCollection(list):
 	model = Model

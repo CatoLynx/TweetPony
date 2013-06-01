@@ -36,7 +36,7 @@ class KWArgDict(dict):
 			return dict.__getitem__(self, key)
 
 class API(object):
-	def __init__(self, consumer_key, consumer_secret, access_token = None, access_token_secret = None, host = "api.twitter.com", root = "/1.1/", oauth_host = "api.twitter.com", oauth_root = "/oauth/", secure = True, timeout = None, load_user = True):
+	def __init__(self, consumer_key, consumer_secret, access_token = None, access_token_secret = None, host = "api.twitter.com", root = "/1.1/", oauth_host = "api.twitter.com", oauth_root = "/oauth/", secure = True, timeout = None, load_user = True, json_in_models = False):
 		self.consumer_key = consumer_key
 		self.consumer_secret = consumer_secret
 		self.access_token = access_token
@@ -50,6 +50,7 @@ class API(object):
 		self.load_user = load_user
 		self._endpoint = None
 		self._multipart = False
+		self.json_in_models = json_in_models
 		self.request_token = None
 		self.request_token_secret = None
 		self.user = self.verify_credentials() if self.load_user and self.access_token and self.access_token_secret else DummyUser()
