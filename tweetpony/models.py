@@ -147,6 +147,9 @@ class Status(Model):
 		self = tmp
 		return self
 	
+	def clean_text(self):
+		return self.text.replace("&lt;", "<").replace("&gt;", ">")
+	
 	def favorite(self):
 		return self.api.favorite(id = self.id)
 	

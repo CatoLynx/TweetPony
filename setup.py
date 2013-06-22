@@ -15,7 +15,7 @@ setup(
 	license = metadata['license'],
 	author = metadata['author'],
 	author_email = metadata['author_email'],
-	install_requires = metadata['dependencies'],
+	install_requires = metadata['requires'],
 	url = metadata['url'],
 	keywords = metadata['keywords'],
 	packages = find_packages(),
