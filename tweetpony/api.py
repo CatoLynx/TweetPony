@@ -172,14 +172,14 @@ class API(object):
 			try:
 				data = response.json()
 				try:
-					raise APIError(code = data['errors'][0]['code'], description = data['errors'][0]['message'])
+					raise APIError(code = data['errors'][0]['code'], description = data['errors'][0]['message'], body = response.text or None)
 				except TypeError:
 					raise APIError(code = -1, description = data['errors'])
 			except APIError:
 				raise
 			except:
 				description = " ".join(response.headers['status'].split()[1:]) if response.headers.get('status', None) else "Unknown Error"
-				raise APIError(code = response.status_code, description = description)
+				raise APIError(code = response.status_code, description = description, body = response.text or None)
 		if stream:
 			return response
 		if is_json:
