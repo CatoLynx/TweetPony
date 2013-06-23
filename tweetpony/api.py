@@ -192,18 +192,23 @@ class API(object):
 	
 	def get_request_token(self, callback_url = None):
 		url = self.build_request_url(self.oauth_root, 'request_token')
-		resp = self.do_request("GET", url, callback_url, is_json = False)
+		resp = self.do_request("POST", url, callback_url, is_json = False)
 		token_data = self.parse_qs(resp)
 		self.set_request_token(token_data['oauth_token'], token_data['oauth_token_secret'])
 		return (self.request_token, self.request_token_secret, token_data.get('oauth_callback_confirmed'))
 	
-	def get_auth_url(self, callback_url = None, token = None):
+	def get_auth_url(self, callback_url = None, force_login = False, screen_name = None, token = None):
 		self.set_request_token(None, None)
 		if token is None:
 			token, secret, callback_confirmed = self.get_request_token(callback_url)
 		if callback_url and not callback_confirmed:
 			raise APIError(code = -1, description = "OAuth callback not confirmed")
-		return self.build_request_url(self.oauth_root, 'authenticate', {'oauth_token': token})
+		data = {'oauth_token': token}
+		if force_login:
+			data['force_login'] = 'true'
+		if screen_name:
+			data['screen_name'] = screen_name
+		return self.build_request_url(self.oauth_root, 'authenticate', data)
 	
 	def authenticate(self, verifier):
 		url = self.build_request_url(self.oauth_root, 'access_token')
