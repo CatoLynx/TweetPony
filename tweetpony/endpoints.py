@@ -765,7 +765,7 @@ STREAM_ENDPOINTS = {
 		'post': False,
 		'url_params': [],
 		'required_params': [],
-		'optional_params': ['stall_warnings', 'with', 'replies', 'track', 'locations'],
+		'optional_params': ['stall_warnings', 'with', 'replies', 'track', 'locations', 'language'],
 	},
 	'site_stream': {
 		'endpoint': "site.json",
