@@ -2,11 +2,11 @@
 # See the LICENSE file for the full license.
 
 name = "TweetPony"
-version = "1.2.9"
+version = "1.2.10"
 description = "A Twitter library for Python"
 license = "AGPLv3"
 author = "Julian Metzler"
 author_email = "contact@mezgrman.de"
-requires = ['requests<=1.2.0']
+requires = ['requests']
 url = "https://github.com/Mezgrman/TweetPony"
 keywords = "twitter library api wrapper pony"

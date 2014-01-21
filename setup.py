@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 metadata = {}
 with open('tweetpony/metadata.py') as f:
-  exec(f, metadata)
+	exec(f.read(), metadata)
 
 setup(
 	name = metadata['name'],
