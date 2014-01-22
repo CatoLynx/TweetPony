@@ -240,7 +240,7 @@ class API(object):
 					except ValueError:
 						pass
 				elif type(value) in [str, unicode]:
-					value = open(value, 'r')
+					value = open(value, 'rb')
 				del _params[key]
 				if key == 'media':
 					key = 'media[]'
@@ -309,7 +309,7 @@ class API(object):
 		
 		missing_params = []
 		for param in data['required_params']:
-			p = kwargs.get(param) or files.get(param)
+			p = files.get(param) or kwargs.get(param)
 			if p is None:
 				missing_params.append(param)
 		if missing_params:
