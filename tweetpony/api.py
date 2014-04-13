@@ -161,10 +161,13 @@ class API(object):
 		info += "=" * 50
 		print info
 		# END DEBUG"""
-		if method.upper() == "POST":
-			response = requests.post(full_url, data = post, files = files, headers = header, stream = stream, timeout = self.timeout)
-		else:
-			response = requests.get(full_url, data = post, files = files, headers = header, stream = stream, timeout = self.timeout)
+		try:
+			if method.upper() == "POST":
+				response = requests.post(full_url, data = post, files = files, headers = header, stream = stream, timeout = self.timeout)
+			else:
+				response = requests.get(full_url, data = post, files = files, headers = header, stream = stream, timeout = self.timeout)
+		except Exception as exc:
+			raise APIError(code = -1, description = unicode(exc))
 		"""# DEBUG
 		print ("\nResponse:  %s\n" % response.text) + "=" * 50
 		# END DEBUG"""
