@@ -1,6 +1,6 @@
 *.pyc
 *~
-TweetPony.egg-info/
+TweetPony.egg-info/*
 build/
 dist/
 examples/.auth_data.json
