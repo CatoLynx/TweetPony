@@ -22,7 +22,7 @@ def authenticate():
 		auth_data = {'access_token': api.access_token, 'access_token_secret': api.access_token_secret}
 		with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), ".auth_data.json"), 'w') as f:
 			f.write(json.dumps(auth_data))
-		print "Hello, @%s! You have been authenticated. You can now run the other eample scripts without having to authenticate every time." % api.user.screen_name
+		print "Hello, @%s! You have been authenticated. You can now run the other example scripts without having to authenticate every time." % api.user.screen_name
 
 def get_api():
 	if not os.path.exists(os.path.join(os.path.dirname(os.path.realpath(__file__)), ".auth_data.json")):
