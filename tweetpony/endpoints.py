@@ -84,6 +84,14 @@ ENDPOINTS = {
 		'optional_params': ['possibly_sensitive', 'in_reply_to_status_id', 'lat', 'long', 'place_id', 'display_coordinates'],
 		'model': Status,
 	},
+	'update_status_with_multiple_media': {
+		'endpoint': "statuses/update.json",
+		'post': True,
+		'url_params': [],
+		'required_params': ['status', 'media'],
+		'optional_params': ['in_reply_to_status_id', 'lat', 'long', 'place_id', 'display_coordinates', 'trim_user'],
+		'model': Status,
+	},
 	'oembed': {
 		'endpoint': "statuses/oembed.json",
 		'post': False,

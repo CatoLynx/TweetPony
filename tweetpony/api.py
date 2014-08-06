@@ -222,11 +222,15 @@ class API(object):
 		return ((self.access_token, self.access_token_secret), token_data['user_id'], token_data['screen_name'])
 	
 	def parse_param(self, key, value):
+		if key == 'media':
+			# This only comes in here when we're uploading multiple images, so ignore it
+			return (key, value)
+		
 		if type(value) == bool:
 			value = "true" if value else "false"
-		elif type(value) == list:
+		elif type(value) in (tuple, list):
 			value = ",".join([str(val) for val in value])
-		elif type(value) not in [str, unicode] and value is not None:
+		elif type(value) not in (str, unicode) and value is not None:
 			value = unicode(value)
 		return (key, value)
 	
@@ -237,17 +241,33 @@ class API(object):
 			if value in [None, []]:
 				del _params[key]
 			if key in ['image', 'media', 'banner']:
+				multiple_media = False
 				if type(value) is file:
 					try:
 						value.seek(0)
 					except ValueError:
 						pass
-				elif type(value) in [str, unicode]:
+				elif type(value) in (str, unicode):
 					value = open(value, 'rb')
-				del _params[key]
-				if key == 'media':
-					key = 'media[]'
-				files[key] = value
+				elif type(value) in (list, tuple):
+					# Used when uploading multiple images
+					multiple_media = True
+					value = list(value)
+					for index, item in enumerate(value):
+						if type(item) is file:
+							try:
+								item.seek(0)
+							except ValueError:
+								pass
+						elif type(item) in (str, unicode):
+							value[index] = open(item, 'rb')
+					_params[key] = value
+				
+				if not multiple_media:
+					del _params[key]
+					if key == 'media':
+						key = 'media[]'
+					files[key] = value
 		params = _params
 		parsed_params = dict([self.parse_param(key, value) for key, value in params.iteritems()])
 		return (parsed_params, files)
@@ -327,6 +347,19 @@ class API(object):
 				unsupported_params.append(param)
 		if unsupported_params:
 			raise ParameterError("Unsupported parameters specified: %s" % ", ".join(unsupported_params))
+		
+		if self._endpoint == 'update_status_with_multiple_media':
+			# This is a 2-step process and different from the rest of the API calls, so we need to handle it differently
+			# First we upload all the media files and gather the assigned IDs
+			ids = []
+			for media in kwargs['media']:
+				url = self.build_request_url(self.root, "media/upload.json", host = "upload.twitter.com")
+				resp = self.do_request("POST", url, files = {'media': media})
+				ids.append(resp['media_id'])
+			
+			# Now we have our IDs and can continue with a normal status update, except we pass the additional id list parameter
+			del kwargs['media']
+			kwargs['media_ids'] = self.parse_param('media_ids', ids)[1]
 		
 		if data['url_params'] != []:
 			endpoint = data['endpoint'] % tuple(url_params)
