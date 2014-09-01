@@ -18,7 +18,7 @@ You can see the internal names of all the API endpoints in the file `endpoints.p
 For example, to update your status, you would do:
 
 ```python
-status = api.update_status(status = "Hello world!")
+status = api.update_status("Hello world!")
 ```
 
 All the parameter names are the same as in the API documentation. Values will be automatically converted to their correct representation. For example, the boolean `True` will become the string `true`.
@@ -55,9 +55,14 @@ status.retweet()
 
 Look into `models.py` to see which methods exist for which models.
 
+Details on function parameters
+------------------------------
+If you omit the paramater names in function calls, the order of parameters is as follows: First come all URL parameters / required parameters in the order they are listed in `endpoints.py`, then come all optional parameters.
+
 Image uploading
 ---------------
 For all API endpoints that take an image as a parameter, just pass the image file object to upload as the appropriate parameter and the pony will do the rest for you.
+Multi-image uploading is supported too! Look into the `endpoints.py` and `api.py` files for details.
 
 Error handling
 --------------

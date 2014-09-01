@@ -318,6 +318,17 @@ class API(object):
 		kwargs = KWArgDict(kwargs)
 		data = endpoints[self._endpoint]
 		
+		if args:
+			keys = data['url_params'] + data['required_params'] + data['optional_params']
+			additional_kwargs = dict(zip(keys, args))
+			used_keys = additional_kwargs.keys()
+			duplicate_keys = [key for key in used_keys if key in kwargs]
+			
+			if duplicate_keys:
+				raise ParameterError("Duplicate values for parameters: %s" % ", ".join(duplicate_keys))
+			
+			kwargs.update(additional_kwargs)
+		
 		missing_params = []
 		url_params = []
 		for param in data['url_params']:
