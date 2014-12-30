@@ -19,4 +19,5 @@ setup(
 	url = metadata['url'],
 	keywords = metadata['keywords'],
 	packages = find_packages(),
+	use_2to3 = True,
 )
