@@ -167,7 +167,7 @@ class API(object):
 			else:
 				response = requests.get(full_url, data = post, files = files, headers = header, stream = stream, timeout = self.timeout)
 		except Exception as exc:
-			raise APIError(code = -1, description = unicode(exc))
+			raise APIError(code = None, description = unicode(exc))
 		"""# DEBUG
 		print ("\nResponse:  %s\n" % response.text) + "=" * 50
 		# END DEBUG"""
@@ -177,7 +177,7 @@ class API(object):
 				try:
 					raise APIError(code = data['errors'][0]['code'], description = data['errors'][0]['message'], body = response.text or None)
 				except TypeError:
-					raise APIError(code = -1, description = data['errors'])
+					raise APIError(code = None, description = data['errors'])
 			except APIError:
 				raise
 			except:
@@ -205,7 +205,7 @@ class API(object):
 		if token is None:
 			token, secret, callback_confirmed = self.get_request_token(callback_url)
 		if callback_url and not callback_confirmed:
-			raise APIError(code = -1, description = "OAuth callback not confirmed")
+			raise APIError(code = None, description = "OAuth callback not confirmed")
 		data = {'oauth_token': token}
 		if force_login:
 			data['force_login'] = 'true'
