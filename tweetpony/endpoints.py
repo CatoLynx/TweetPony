@@ -1,5 +1,19 @@
-# Copyright (C) 2013 Julian Metzler
-# See the LICENSE file for the full license.
+# Copyright 2013-2015 Julian Metzler
+
+"""
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
 
 from models import *
 
@@ -65,7 +79,7 @@ ENDPOINTS = {
 		'post': True,
 		'url_params': [],
 		'required_params': ['status'],
-		'optional_params': ['in_reply_to_status_id', 'lat', 'long', 'place_id', 'display_coordinates', 'trim_user'],
+		'optional_params': ['in_reply_to_status_id', 'possibly_sensitive', 'lat', 'long', 'place_id', 'display_coordinates', 'trim_user', 'media_ids'],
 		'model': Status,
 	},
 	'retweet': {
@@ -76,7 +90,8 @@ ENDPOINTS = {
 		'optional_params': ['trim_user'],
 		'model': Status,
 	},
-	'update_status_with_media': {
+	'update_status_with_single_media': {
+		# DEPRECATED
 		'endpoint': "statuses/update_with_media.json",
 		'post': True,
 		'url_params': [],
@@ -84,12 +99,12 @@ ENDPOINTS = {
 		'optional_params': ['possibly_sensitive', 'in_reply_to_status_id', 'lat', 'long', 'place_id', 'display_coordinates'],
 		'model': Status,
 	},
-	'update_status_with_multiple_media': {
+	'update_status_with_media': {
 		'endpoint': "statuses/update.json",
 		'post': True,
 		'url_params': [],
 		'required_params': ['status', 'media'],
-		'optional_params': ['in_reply_to_status_id', 'lat', 'long', 'place_id', 'display_coordinates', 'trim_user'],
+		'optional_params': ['in_reply_to_status_id', 'possibly_sensitive', 'lat', 'long', 'place_id', 'display_coordinates', 'trim_user'],
 		'model': Status,
 	},
 	'oembed': {
@@ -100,12 +115,28 @@ ENDPOINTS = {
 		'optional_params': ['id', 'url', 'maxwidth', 'hide_media', 'hide_thread', 'omit_script', 'align', 'related', 'lang'],
 		'model': OEmbed,
 	},
+	'retweeters': {
+		'endpoint': "statuses/retweeters/ids.json",
+		'post': False,
+		'url_params': [],
+		'required_params': ['id'],
+		'optional_params': ['cursor', 'stringify_ids'],
+		'model': CursoredUserCollection,
+	},
+	'get_statuses': {
+		'endpoint': "statuses/lookup.json",
+		'post': True,
+		'url_params': [],
+		'required_params': ['id'],
+		'optional_params': ['include_entities', 'trim_user', 'map'],
+		'model': StatusCollection,
+	},
 	'search_tweets': {
 		'endpoint': "search/tweets.json",
 		'post': False,
 		'url_params': [],
 		'required_params': ['q'],
-		'optional_params': ['geocode', 'lang', 'locale', 'result_type', 'count', 'until', 'since_id', 'max_id', 'include_entities'],
+		'optional_params': ['geocode', 'lang', 'locale', 'result_type', 'count', 'until', 'since_id', 'max_id', 'include_entities', 'callback'],
 		'model': SearchResult,
 	},
 	'received_messages': {
@@ -113,7 +144,7 @@ ENDPOINTS = {
 		'post': False,
 		'url_params': [],
 		'required_params': [],
-		'optional_params': ['since_id', 'max_id', 'count', 'page', 'include_entities', 'skip_status'],
+		'optional_params': ['since_id', 'max_id', 'count', 'include_entities', 'skip_status'],
 		'model': MessageCollection,
 	},
 	'sent_messages': {
@@ -161,7 +192,7 @@ ENDPOINTS = {
 		'post': False,
 		'url_params': [],
 		'required_params': [],
-		'optional_params': ['user_id', 'screen_name', 'cursor', 'stringify_ids'],
+		'optional_params': ['user_id', 'screen_name', 'cursor', 'stringify_ids', 'count'],
 		'model': CursoredIDCollection,
 	},
 	'followers_ids': {
@@ -169,7 +200,7 @@ ENDPOINTS = {
 		'post': False,
 		'url_params': [],
 		'required_params': [],
-		'optional_params': ['user_id', 'screen_name', 'cursor', 'stringify_ids'],
+		'optional_params': ['user_id', 'screen_name', 'cursor', 'stringify_ids', 'count'],
 		'model': CursoredIDCollection,
 	},
 	'get_friendships': {
@@ -233,7 +264,7 @@ ENDPOINTS = {
 		'post': False,
 		'url_params': [],
 		'required_params': [],
-		'optional_params': ['user_id', 'screen_name', 'cursor', 'skip_status', 'include_user_entities'],
+		'optional_params': ['user_id', 'screen_name', 'cursor', 'count', 'skip_status', 'include_user_entities'],
 		'model': CursoredUserCollection,
 	},
 	'followers': {
@@ -241,7 +272,7 @@ ENDPOINTS = {
 		'post': False,
 		'url_params': [],
 		'required_params': [],
-		'optional_params': ['user_id', 'screen_name', 'cursor', 'skip_status', 'include_user_entities'],
+		'optional_params': ['user_id', 'screen_name', 'cursor', 'count', 'skip_status', 'include_user_entities'],
 		'model': CursoredUserCollection,
 	},
 	'get_settings': {
@@ -269,6 +300,7 @@ ENDPOINTS = {
 		'model': Settings,
 	},
 	'update_delivery_device': {
+		# This seems to have been removed?
 		'endpoint': "account/update_delivery_device.json",
 		'post': True,
 		'url_params': [],
@@ -281,7 +313,7 @@ ENDPOINTS = {
 		'post': True,
 		'url_params': [],
 		'required_params': [],
-		'optional_params': ['name', 'url', 'location', 'description', 'include_entities', 'skip_status'],
+		'optional_params': ['name', 'url', 'location', 'description', 'profile_link_color', 'include_entities', 'skip_status'],
 		'model': User,
 	},
 	'update_background': {
@@ -290,14 +322,6 @@ ENDPOINTS = {
 		'url_params': [],
 		'required_params': [],
 		'optional_params': ['image', 'tile', 'include_entities', 'skip_status', 'use'],
-		'model': User,
-	},
-	'update_colors': {
-		'endpoint': "account/update_profile_colors.json",
-		'post': True,
-		'url_params': [],
-		'required_params': [],
-		'optional_params': ['profile_background_color', 'profile_link_color', 'profile_sidebar_border_color', 'profile_sidebar_fill_color', 'profile_text_color', 'include_entities', 'skip_status'],
 		'model': User,
 	},
 	'update_profile_image': {
@@ -457,7 +481,7 @@ ENDPOINTS = {
 		'post': False,
 		'url_params': [],
 		'required_params': [],
-		'optional_params': ['user_id', 'screen_name'],
+		'optional_params': ['user_id', 'screen_name', 'reverse'],
 		'model': ListCollection,
 	},
 	'list_timeline': {
@@ -481,7 +505,7 @@ ENDPOINTS = {
 		'post': False,
 		'url_params': [],
 		'required_params': [],
-		'optional_params': ['user_id', 'screen_name', 'cursor', 'filter_to_owned_lists'],
+		'optional_params': ['user_id', 'screen_name', 'count', 'cursor', 'filter_to_owned_lists'],
 		'model': CursoredListCollection,
 	},
 	'list_subscribers': {
@@ -489,7 +513,7 @@ ENDPOINTS = {
 		'post': False,
 		'url_params': [],
 		'required_params': [],
-		'optional_params': ['list_id', 'slug', 'owner_screen_name', 'owner_id', 'cursor', 'include_entities', 'skip_status'],
+		'optional_params': ['list_id', 'slug', 'owner_screen_name', 'owner_id', 'count', 'cursor', 'include_entities', 'skip_status'],
 		'model': CursoredUserCollection,
 	},
 	'follow_list': {
@@ -513,7 +537,7 @@ ENDPOINTS = {
 		'post': True,
 		'url_params': [],
 		'required_params': [],
-		'optional_params': ['owner_screen_name', 'owner_id', 'list_id', 'slug'],
+		'optional_params': ['list_id', 'slug', 'owner_screen_name', 'owner_id'],
 		'model': List,
 	},
 	'batch_add_to_list': {
@@ -529,7 +553,7 @@ ENDPOINTS = {
 		'post': False,
 		'url_params': [],
 		'required_params': [],
-		'optional_params': ['list_id', 'slug', 'user_id', 'screen_name', 'owner_screen_name', 'owner_id', 'include_entities'],
+		'optional_params': ['list_id', 'slug', 'user_id', 'screen_name', 'owner_screen_name', 'owner_id', 'include_entities', 'skip_status'],
 		'model': User,
 	},
 	'list_members': {
@@ -537,7 +561,7 @@ ENDPOINTS = {
 		'post': False,
 		'url_params': [],
 		'required_params': [],
-		'optional_params': ['list_id', 'slug', 'owner_screen_name', 'owner_id', 'cursor', 'include_entities', 'skip_status'],
+		'optional_params': ['list_id', 'slug', 'owner_screen_name', 'owner_id', 'count', 'cursor', 'include_entities', 'skip_status'],
 		'model': CursoredUserCollection,
 	},
 	'add_to_list': {
@@ -582,6 +606,14 @@ ENDPOINTS = {
 	},
 	'subscribed_lists': {
 		'endpoint': "lists/subscriptions.json",
+		'post': False,
+		'url_params': [],
+		'required_params': [],
+		'optional_params': ['user_id', 'screen_name', 'count', 'cursor'],
+		'model': CursoredListCollection,
+	},
+	'owned_lists': {
+		'endpoint': "lists/ownerships.json",
 		'post': False,
 		'url_params': [],
 		'required_params': [],
@@ -641,7 +673,7 @@ ENDPOINTS = {
 		'post': False,
 		'url_params': [],
 		'required_params': ['lat', 'long'],
-		'optional_params': ['accuracy', 'granularity', 'max_results'],
+		'optional_params': ['accuracy', 'granularity', 'max_results', 'callback'],
 		'model': PlaceSearchResult,
 	},
 	'search_places': {
@@ -649,24 +681,8 @@ ENDPOINTS = {
 		'post': False,
 		'url_params': [],
 		'required_params': [],
-		'optional_params': ['lat', 'long', 'query', 'ip', 'granularity', 'accuracy', 'max_results', 'contained_within'],
+		'optional_params': ['lat', 'long', 'query', 'ip', 'granularity', 'accuracy', 'max_results', 'contained_within', 'callback'],
 		'model': PlaceSearchResult,
-	},
-	'similar_places': {
-		'endpoint': "geo/similar_places.json",
-		'post': False,
-		'url_params': [],
-		'required_params': ['lat', 'long', 'name'],
-		'optional_params': ['contained_within'],
-		'model': PlaceSearchResult,
-	},
-	'create_place': {
-		'endpoint': "geo/place.json",
-		'post': True,
-		'url_params': [],
-		'required_params': ['name', 'contained_within', 'token', 'lat', 'long'],
-		'optional_params': [],
-		'model': Place,
 	},
 	'trends': {
 		'endpoint': "trends/place.json",
@@ -739,6 +755,38 @@ ENDPOINTS = {
 		'required_params': [],
 		'optional_params': ['resources'],
 		'model': RateLimitStatus,
+	},
+	'mute_user': {
+		'endpoint': "mutes/users/create.json",
+		'post': True,
+		'url_params': [],
+		'required_params': [],
+		'optional_params': ['screen_name', 'user_id'],
+		'model': User,
+	},
+	'unmute_user': {
+		'endpoint': "mutes/users/destroy.json",
+		'post': True,
+		'url_params': [],
+		'required_params': [],
+		'optional_params': ['screen_name', 'user_id'],
+		'model': User,
+	},
+	'muted_users_ids': {
+		'endpoint': "mutes/users/ids.json",
+		'post': False,
+		'url_params': [],
+		'required_params': [],
+		'optional_params': ['cursor'],
+		'model': CursoredIDCollection,
+	},
+	'muted_users': {
+		'endpoint': "mutes/users/list.json",
+		'post': False,
+		'url_params': [],
+		'required_params': [],
+		'optional_params': ['cursor', 'include_entities', 'skip_status'],
+		'model': CursoredUserCollection,
 	},
 }
 

@@ -1,5 +1,19 @@
-# Copyright (C) 2013 Julian Metzler
-# See the LICENSE file for the full license.
+# Copyright 2013-2015 Julian Metzler
+
+"""
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
 
 import base64
 import binascii
@@ -320,14 +334,19 @@ class API(object):
 		
 		if args:
 			keys = data['url_params'] + data['required_params'] + data['optional_params']
-			additional_kwargs = dict(zip(keys, args))
+			additional_kwargs, additional_files = self.parse_params(dict(zip(keys, args)))
 			used_keys = additional_kwargs.keys()
+			used_file_keys = additional_files.keys()
 			duplicate_keys = [key for key in used_keys if key in kwargs]
+			duplicate_file_keys = [key for key in used_file_keys if key in files]
 			
-			if duplicate_keys:
-				raise ParameterError("Duplicate values for parameters: %s" % ", ".join(duplicate_keys))
+			if duplicate_keys or duplicate_file_keys:
+				raise ParameterError("Duplicate values for parameters: %s" % ", ".join(duplicate_keys + duplicate_file_keys))
 			
 			kwargs.update(additional_kwargs)
+			files.update(additional_files)
+		
+		print kwargs, files
 		
 		missing_params = []
 		url_params = []
@@ -359,7 +378,7 @@ class API(object):
 		if unsupported_params:
 			raise ParameterError("Unsupported parameters specified: %s" % ", ".join(unsupported_params))
 		
-		if self._endpoint == 'update_status_with_multiple_media':
+		if self._endpoint == 'update_status_with_media':
 			# This is a 2-step process and different from the rest of the API calls, so we need to handle it differently
 			# First we upload all the media files and gather the assigned IDs
 			ids = []
