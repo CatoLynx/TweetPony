@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import json
 import locale
 import utils
+
 from datetime import datetime
 from error import ParameterError
 
@@ -149,6 +150,8 @@ class Status(Model):
 				value = strptime(value)
 			elif key == 'user':
 				value = User.from_json(value)
+			elif key == 'text':
+				value = value.replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", "&")
 			elif key == 'retweeted_status':
 				value = Status.from_json(value)
 			elif key == 'source':
@@ -162,7 +165,7 @@ class Status(Model):
 		return self
 	
 	def clean_text(self):
-		return self.text.replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", "&")
+		return self.text
 	
 	def favorite(self):
 		return self.api.favorite(id = self.id)
