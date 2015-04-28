@@ -342,9 +342,7 @@ class API(object):
 			
 			kwargs.update(additional_kwargs)
 			files.update(additional_files)
-		
-		print kwargs, files
-		
+
 		missing_params = []
 		url_params = []
 		for param in data['url_params']:
