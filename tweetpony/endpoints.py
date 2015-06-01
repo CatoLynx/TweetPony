@@ -541,7 +541,7 @@ ENDPOINTS = {
 		'model': List,
 	},
 	'batch_add_to_list': {
-		'endpoint': "lists/memberships/create_all.json",
+		'endpoint': "lists/members/create_all.json",
 		'post': True,
 		'url_params': [],
 		'required_params': [],
