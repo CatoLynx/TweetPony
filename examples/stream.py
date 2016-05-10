@@ -20,16 +20,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 This script starts a user stream and displays new tweets.
 """
 
-from _common import get_api
 import tweetpony
 
 class StreamProcessor(tweetpony.StreamProcessor):
 	def on_status(self, status):
 		print "%s: %s" % (status.user.screen_name, status.text)
+		print ""
 		return True
 
 def main():
-	api = get_api()
+	api = tweetpony.API(consumer_key = "", consumer_secret = "", access_token = "", access_token_secret = "")
 	if not api:
 		return
 	processor = StreamProcessor(api)
